@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR 코드 스캔 데모2</title>
-    <!-- html5-qrcode 라이브러리 로드 -->
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <title>QR 코드 스캔 데모</title>
+    <!-- 올바른 CDN -->
+    <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -30,28 +30,22 @@
     <script>
         function onScanSuccess(decodedText) {
             console.log("스캔 성공:", decodedText);
-            // QR 안에 URL이 포함된 경우
-            if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
+            if (decodedText.startsWith("http")) {
                 window.location.href = decodedText;
             } else {
-                // 단순 ID인 경우 예시 페이지로 이동
                 window.location.href = "/detail/" + decodedText + ".html";
             }
         }
 
         function onScanError(errorMessage) {
-            // 스캔 실패시 (에러 무시 또는 로그 출력)
             console.warn("스캔 에러:", errorMessage);
         }
 
-        // Html5QrcodeScanner 인스턴스 생성
-        const html5QrCode = new Html5QrcodeScanner(
-            "reader",
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            }
-        );
+        // ✅ 이제 정상 작동
+        const html5QrCode = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+        });
         html5QrCode.render(onScanSuccess, onScanError);
     </script>
 </body>
