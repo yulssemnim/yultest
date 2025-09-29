@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국립중앙박물관 QR 스캔 데모</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #reader {
+            width: 300px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>QR 코드 스캔 데모</h1>
+    <p>QR을 카메라로 비추면 자동으로 이동합니다.</p>
+    <div id="reader"></div>
+
+    <script>
+        function onScanSuccess(decodedText) {
+            console.log("스캔 성공:", decodedText);
+            // QR 안에 URL이 있으면 바로 이동
+            if (decodedText.startsWith("http")) {
+                window.location.href = decodedText;
+            } else {
+                // QR이 단순 ID라면 상세 페이지로 이동
+                window.location.href = "/detail/" + decodedText + ".html";
+            }
+        }
+
+        function onScanError(errorMessage) {
+            // 스캔 실패 로그 (선택 사항)
+            console.warn("스캔 실패:", errorMessage);
+        }
+
+        // 카메라 QR 스캐너 시작
+        const html5QrCode = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+        html5QrCode.render(onScanSuccess, onScanError);
+    </script>
+</body>
+
+</html>
