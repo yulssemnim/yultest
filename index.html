@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR 코드 스캔 데모</title>
-    <!-- 올바른 CDN -->
     <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
     <style>
         body {
@@ -16,21 +15,49 @@
 
         #reader {
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
             margin: 20px auto;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .sample {
+            margin-top: 30px;
+        }
+
+        .sample img {
             border: 1px solid #ccc;
+            padding: 8px;
         }
     </style>
 </head>
 
 <body>
     <h1>QR 코드 스캔 데모</h1>
-    <p>QR을 카메라로 비추면 자동으로 이동합니다.</p>
+    <p>📷 카메라로 QR 코드를 비추면 자동으로 이동합니다.</p>
     <div id="reader"></div>
+    <div id="status">카메라 준비 중...</div>
+
+    <!-- 샘플 QR 표시 -->
+    <div class="sample">
+        <h3>🎯 테스트용 QR 코드</h3>
+        <p>아래 QR을 다른 기기로 스캔해보세요.</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://yulssemnim.github.io/yultest/detail/1234.html"
+            alt="샘플 QR 코드">
+        <p><a href="detail/1234.html">👉 상세페이지 1234 직접 보기</a></p>
+    </div>
 
     <script>
+        const html5QrCode = new Html5Qrcode("reader");
+
+        // ✅ 스캔 성공 시
         function onScanSuccess(decodedText) {
-            console.log("스캔 성공:", decodedText);
+            document.getElementById("status").textContent = "✅ QR 인식 성공: " + decodedText;
+
             if (decodedText.startsWith("http")) {
                 window.location.href = decodedText;
             } else {
@@ -38,16 +65,29 @@
             }
         }
 
-        function onScanError(errorMessage) {
-            console.warn("스캔 에러:", errorMessage);
+        // ❌ 스캔 실패 시 (로그만 출력)
+        function onScanFailure(error) {
+            console.log("인식 실패:", error);
         }
 
-        // ✅ 이제 정상 작동
-        const html5QrCode = new Html5QrcodeScanner("reader", {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
+        // 📷 카메라 자동 실행 (후면 카메라 우선)
+        Html5Qrcode.getCameras().then(cameras => {
+            if (cameras && cameras.length) {
+                const cameraId = cameras.length > 1 ? cameras[1].id : cameras[0].id;
+                html5QrCode.start(
+                    cameraId,
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onScanSuccess,
+                    onScanFailure
+                ).then(() => {
+                    document.getElementById("status").textContent = "📷 카메라 실행 중... QR 코드를 비춰주세요.";
+                });
+            } else {
+                document.getElementById("status").textContent = "❌ 카메라를 찾을 수 없습니다.";
+            }
+        }).catch(err => {
+            document.getElementById("status").textContent = "⚠️ 카메라 실행 실패: " + err;
         });
-        html5QrCode.render(onScanSuccess, onScanError);
     </script>
 </body>
 
