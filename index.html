@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>국립중앙박물관 QR 스캔 데모</title>
+    <title>QR 코드 스캔 데모</title>
+    <!-- html5-qrcode 라이브러리 로드 -->
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
         body {
@@ -14,7 +15,8 @@
         }
 
         #reader {
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             margin: 20px auto;
         }
     </style>
@@ -28,25 +30,28 @@
     <script>
         function onScanSuccess(decodedText) {
             console.log("스캔 성공:", decodedText);
-            // QR 안에 URL이 있으면 바로 이동
-            if (decodedText.startsWith("http")) {
+            // QR 안에 URL이 포함된 경우
+            if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
                 window.location.href = decodedText;
             } else {
-                // QR이 단순 ID라면 상세 페이지로 이동
+                // 단순 ID인 경우 예시 페이지로 이동
                 window.location.href = "/detail/" + decodedText + ".html";
             }
         }
 
         function onScanError(errorMessage) {
-            // 스캔 실패 로그 (선택 사항)
-            console.warn("스캔 실패:", errorMessage);
+            // 스캔 실패시 (에러 무시 또는 로그 출력)
+            console.warn("스캔 에러:", errorMessage);
         }
 
-        // 카메라 QR 스캐너 시작
-        const html5QrCode = new Html5QrcodeScanner("reader", {
-            fps: 10,
-            qrbox: 250
-        });
+        // Html5QrcodeScanner 인스턴스 생성
+        const html5QrCode = new Html5QrcodeScanner(
+            "reader",
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            }
+        );
         html5QrCode.render(onScanSuccess, onScanError);
     </script>
 </body>
